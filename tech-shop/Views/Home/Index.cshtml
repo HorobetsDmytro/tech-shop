@@ -1,10 +1,43 @@
 ﻿@model IEnumerable<tech_shop.Models.Product>
 
 @{
-    ViewData["Title"] = "Home Page"; int currentPage = ViewBag.CurrentPage; int totalPages = ViewBag.TotalPages;
+    ViewData["Title"] = "Home Page";
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+    string currentSortOrder = ViewBag.SortOrder;
+    int? currentCategoryId = ViewBag.CategoryId;
 }
 
-<div class="container"> <h1 class="my-4">Our Products</h1>
+<div class="container">
+    <h1 class="my-4">Our Products</h1>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form asp-action="Index" method="get" class="form-inline">
+                <label class="mr-2">Sort by:</label>
+                <select name="sortOrder" class="form-control mr-2" onchange="this.form.submit()">
+                    <option value="">Default</option>
+                    <option value="price_asc" selected="@(currentSortOrder == "price_asc")">Price: Low to High</option>
+                    <option value="price_desc" selected="@(currentSortOrder == "price_desc")">Price: High to Low</option>
+                </select>
+                <input type="hidden" name="categoryId" value="@currentCategoryId" />
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form asp-action="Index" method="get" class="form-inline">
+                <label class="mr-2">Filter by Category:</label>
+                <select name="categoryId" class="form-control mr-2" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.Id" selected="@(currentCategoryId == category.Id)">@category.Name</option>
+                    }
+                </select>
+                <input type="hidden" name="sortOrder" value="@currentSortOrder" />
+            </form>
+        </div>
+    </div>
+
     @for (int i = 0; i < Model.Count(); i += 4)
     {
         <div class="row mb-4">
@@ -29,7 +62,7 @@
             @if (currentPage > 1)
             {
                 <li class="page-item">
-                    <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1 })" aria-label="Previous">
+                    <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1, sortOrder = currentSortOrder, categoryId = currentCategoryId })" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
@@ -37,13 +70,13 @@
             @for (int i = 1; i <= totalPages; i++)
             {
                 <li class="page-item @(i == currentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                    <a class="page-link" href="@Url.Action("Index", new { page = i, sortOrder = currentSortOrder, categoryId = currentCategoryId })">@i</a>
                 </li>
             }
             @if (currentPage < totalPages)
             {
                 <li class="page-item">
-                    <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1 })" aria-label="Next">
+                    <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1, sortOrder = currentSortOrder, categoryId = currentCategoryId })" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
