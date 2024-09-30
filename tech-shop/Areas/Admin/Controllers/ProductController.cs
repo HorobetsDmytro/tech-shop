@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using tech_shop.Interfaces;
 using tech_shop.Models;
 
-namespace tech_shop.Controllers
+namespace tech_shop.Areas.Admin.Controllers
 {
+    //[Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
@@ -18,22 +21,20 @@ namespace tech_shop.Controllers
         public IActionResult Index()
         {
             var products = _productRepository.GetAll();
-            ViewBag.Categories = _categoryRepository.GetAll();
             return View(products);
         }
 
         public IActionResult Details(int id)
         {
             var product = _productRepository.GetById(id);
-
-            var categories = _categoryRepository.GetAll();
-
-            ViewBag.Categories = categories;
-
+            if (product == null)
+            {
+                return NotFound();
+            }
             return View(product);
         }
 
-        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewBag.Categories = _categoryRepository.GetAll();
@@ -41,6 +42,7 @@ namespace tech_shop.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(Product product)
         {
             if (ModelState.IsValid)
@@ -48,15 +50,11 @@ namespace tech_shop.Controllers
                 _productRepository.Add(product);
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                Console.WriteLine("Помилка");
-            }
             ViewBag.Categories = _categoryRepository.GetAll();
             return View(product);
         }
 
-        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             var product = _productRepository.GetById(id);
@@ -69,6 +67,7 @@ namespace tech_shop.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(Product product)
         {
             if (ModelState.IsValid)
@@ -80,22 +79,19 @@ namespace tech_shop.Controllers
             return View(product);
         }
 
-        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var product = _productRepository.GetById(id);
-            //if (product == null)
-            //{
-            //    return NotFound();
-            //}
-
-            var categories = _categoryRepository.GetAll();
-
-            ViewBag.Categories = categories;
+            if (product == null)
+            {
+                return NotFound();
+            }
             return View(product);
         }
 
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteConfirmed(int id)
         {
             _productRepository.Delete(id);

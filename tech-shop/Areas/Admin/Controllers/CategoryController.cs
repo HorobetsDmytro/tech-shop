@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using tech_shop.Interfaces;
 using tech_shop.Models;
 
-namespace tech_shop.Controllers
+namespace tech_shop.Areas.Admin.Controllers
 {
+    //[Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository _categoryRepository;

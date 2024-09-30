@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using tech_shop.Interfaces;
-using tech_shop.Models;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using tech_shop.Repositories;
+using tech_shop.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using tech_shop.Models;
 
 namespace tech_shop.Controllers
 {
@@ -18,7 +17,8 @@ namespace tech_shop.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        public IActionResult Index(int page = 1, string sortOrder = "", int? categoryId = null)
+        public IActionResult Index(int page = 1, string sortOrder = "", int? categoryId = null,
+                                   double? minPrice = null, double? maxPrice = null)
         {
             int pageSize = 8;
             var query = _productRepository.GetProducts();
@@ -27,6 +27,16 @@ namespace tech_shop.Controllers
             if (categoryId.HasValue)
             {
                 query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
+            // Фільтрація за ціною
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
             }
 
             // Сортування
@@ -52,7 +62,9 @@ namespace tech_shop.Controllers
             ViewBag.TotalPages = totalPages;
             ViewBag.SortOrder = sortOrder;
             ViewBag.CategoryId = categoryId;
-            ViewBag.Categories = _categoryRepository.GetAll(); // Припускаємо, що у вас є метод GetAll() у CategoryRepository
+            ViewBag.MinPrice = minPrice;
+            ViewBag.MaxPrice = maxPrice;
+            ViewBag.Categories = _categoryRepository.GetAll();
 
             return View(paginatedProducts);
         }

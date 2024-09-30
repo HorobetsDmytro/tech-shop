@@ -20,3 +20,8 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.form-inline .form-group {
+    display: inline-block;
+    margin-right: 5px;
+}

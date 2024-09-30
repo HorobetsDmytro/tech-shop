@@ -14,5 +14,10 @@ namespace tech_shop.Repositories
             base.Add(category);
             Console.WriteLine("Category added successfully");
         }
+
+        public IEnumerable<Category> GetCategories()
+        {
+            return _context.Categories.ToList();
+        }
     }
 }
