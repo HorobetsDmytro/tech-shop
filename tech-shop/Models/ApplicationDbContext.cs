@@ -17,6 +17,8 @@ namespace tech_shop.Models
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +50,21 @@ namespace tech_shop.Models
                 .HasOne(oi => oi.Product)
                 .WithMany()
                 .HasForeignKey(oi => oi.ProductId);
+
+            modelBuilder.Entity<ShoppingCart>()
+                .HasOne(sc => sc.User)
+                .WithOne()
+                .HasForeignKey<ShoppingCart>(sc => sc.UserId);
+
+            modelBuilder.Entity<ShoppingCartItem>()
+                .HasOne(sci => sci.ShoppingCart)
+                .WithMany(sc => sc.Items)
+                .HasForeignKey(sci => sci.ShoppingCartId);
+
+            modelBuilder.Entity<ShoppingCartItem>()
+                .HasOne(sci => sci.Product)
+                .WithMany()
+                .HasForeignKey(sci => sci.ProductId);
         }
     }
 }

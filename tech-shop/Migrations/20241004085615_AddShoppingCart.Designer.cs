@@ -12,8 +12,8 @@ using tech_shop.Models;
 namespace tech_shop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240929171616_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241004085615_AddShoppingCart")]
+    partial class AddShoppingCart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -251,6 +251,52 @@ namespace tech_shop.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("tech_shop.Models.ShoppingCart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("ShoppingCarts");
+                });
+
+            modelBuilder.Entity("tech_shop.Models.ShoppingCartItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ShoppingCartId");
+
+                    b.ToTable("ShoppingCartItems");
+                });
+
             modelBuilder.Entity("tech_shop.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -350,9 +396,44 @@ namespace tech_shop.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("tech_shop.Models.ShoppingCart", b =>
+                {
+                    b.HasOne("tech_shop.Models.User", "User")
+                        .WithOne()
+                        .HasForeignKey("tech_shop.Models.ShoppingCart", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("tech_shop.Models.ShoppingCartItem", b =>
+                {
+                    b.HasOne("tech_shop.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("tech_shop.Models.ShoppingCart", "ShoppingCart")
+                        .WithMany("Items")
+                        .HasForeignKey("ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ShoppingCart");
+                });
+
             modelBuilder.Entity("tech_shop.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("tech_shop.Models.ShoppingCart", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
