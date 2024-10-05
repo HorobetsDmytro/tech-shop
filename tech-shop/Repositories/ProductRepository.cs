@@ -18,9 +18,22 @@ namespace tech_shop.Repositories
             _context.SaveChanges();
         }
 
-        public IEnumerable<Product> GetProducts()
+        public IEnumerable<Product> GetProduct()
         {
             return _context.Products.ToList();
+        }
+        
+        public IQueryable<Product> GetProducts()
+        {
+            return _context.Products.AsQueryable();
+        }
+
+        public IQueryable<Product> SearchProducts(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+                return GetProducts();
+
+            return _context.Products.Where(p => p.Name.Contains(searchTerm));
         }
     }
 }

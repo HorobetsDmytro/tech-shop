@@ -18,10 +18,14 @@ namespace tech_shop.Controllers
         }
 
         public IActionResult Index(int page = 1, string sortOrder = "", int? categoryId = null,
-                                   double? minPrice = null, double? maxPrice = null)
+                                   double? minPrice = null, double? maxPrice = null, string searchTerm = "")
         {
             int pageSize = 8;
-            var query = _productRepository.GetProducts();
+            var query = string.IsNullOrWhiteSpace(searchTerm)
+            ? _productRepository.GetProduct()
+            : _productRepository.SearchProducts(searchTerm);
+
+
 
             // Фільтрація за категорією
             if (categoryId.HasValue)
@@ -64,6 +68,7 @@ namespace tech_shop.Controllers
             ViewBag.CategoryId = categoryId;
             ViewBag.MinPrice = minPrice;
             ViewBag.MaxPrice = maxPrice;
+            ViewBag.SearchTerm = searchTerm;
             ViewBag.Categories = _categoryRepository.GetAll();
 
             return View(paginatedProducts);

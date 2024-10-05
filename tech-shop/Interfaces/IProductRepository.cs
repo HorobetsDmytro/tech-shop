@@ -6,6 +6,8 @@ namespace tech_shop.Interfaces
     {
         IEnumerable<Product> GetProductsByCategory(int categoryId);
 
-        IEnumerable<Product> GetProducts();
+        IEnumerable<Product> GetProduct();
+
+        IQueryable<Product> SearchProducts(string searchTerm);
     }
 }
